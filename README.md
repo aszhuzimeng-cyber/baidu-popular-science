@@ -28,23 +28,45 @@ npm run build
 
 输出目录为 `dist/`。
 
-## 发布到 GitHub Pages
+## 发布到 GitHub Pages（简历链接）
 
-1. 将整个仓库推送到 GitHub（默认分支 `main`）。
-2. 打开仓库 **Settings → Pages → Build and deployment**，Source 选 **GitHub Actions**。
-3. 推送后，`.github/workflows/pages.yml` 会自动构建并发布。
+### 第一次部署
 
-发布后访问地址：
+1. 在 GitHub 新建一个**空仓库**（不要勾选 README），例如 `interactive-portfolio`。
+2. 在本项目根目录执行（把 `你的用户名` 和 `仓库名` 换成你的）：
 
-- 用户/组织主页仓库：`https://<username>.github.io/`
-- 普通项目仓库：`https://<username>.github.io/<repo-name>/`
+```bash
+git remote add origin https://github.com/你的用户名/仓库名.git
+git push -u origin main
+```
 
-站点使用相对路径，GitHub Pages 上两个 Demo 均可正常打开：
+3. 打开仓库 **Settings → Pages → Build and deployment**，Source 选择 **GitHub Actions**。
+4. 等 Actions 里的 `Deploy portfolio to GitHub Pages` 跑绿（大约 2–3 分钟）。
+5. 回到 **Settings → Pages**，复制站点地址，写进简历。
 
-- 弱视科普：`https://<username>.github.io/<repo-name>/amblyopia/`
-- 数字皮影：`https://<username>.github.io/<repo-name>/shadow-story/`
+### 简历里可以放的链接
 
-把首页链接放进简历或作品集即可。
+普通项目仓库（最常见）：
+
+- 作品集首页：`https://你的用户名.github.io/仓库名/`
+- 数字皮影：`https://你的用户名.github.io/仓库名/shadow-story/`
+- 弱视科普：`https://你的用户名.github.io/仓库名/amblyopia/`
+
+如果仓库名是 `你的用户名.github.io`（用户主页仓库），首页地址则是：
+
+- `https://你的用户名.github.io/`
+
+### 后续更新
+
+改完代码后：
+
+```bash
+git add .
+git commit -m "更新作品集"
+git push
+```
+
+推送后会自动重新构建并发布。
 
 ## 目录结构
 
