@@ -1,0 +1,15 @@
+{
+  "name": "amblyopia-vision-demo",
+  "private": true,
+  "scripts": {
+    "build": "esbuild assets/ts/main.ts --bundle --format=esm --outfile=assets/js/main.js --target=es2020 --loader:.js=js",
+    "dev": "npm run build && npx --yes serve -l 8765 ."
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "three": "^0.160.0"
+  }
+}

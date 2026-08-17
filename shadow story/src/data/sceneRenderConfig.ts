@@ -1,0 +1,1 @@
+export const SCENE_DECOR_BASE_WIDTH = 176;

@@ -1,0 +1,17 @@
+node_modules/
+dist/
+
+*.log
+*.tsbuildinfo
+
+.env.local
+.env.*.local
+
+.edge-shot-profile/
+scripts/.tmp/
+scripts/font-source/
+
+NUL
+PROJECT_TREE.txt
+.DS_Store
+Thumbs.db

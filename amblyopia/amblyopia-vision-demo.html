@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>儿童弱视机制互动科普</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=77" />
+</head>
+<body>
+  <!-- 底层：全屏 3D 场景 -->
+  <div class="scene-layer" id="scene-layer">
+    <canvas id="main-canvas" class="main-canvas"></canvas>
+    <canvas id="overlay-canvas" class="overlay-canvas"></canvas>
+  </div>
+
+  <!-- 上层：悬浮 UI -->
+  <div class="ui-layer" id="app">
+    <button
+      type="button"
+      class="lab-brand"
+      id="lab-brand-btn"
+      aria-label="查看北邮智能交互设计介绍"
+      title="北邮智能交互设计"
+    >
+      <span class="lab-brand-text">弱视形成机制</span>
+      <img class="lab-brand-logo" src="assets/images/bupt-intelligent-interaction-logo.png" alt="北邮智交" draggable="false" />
+    </button>
+
+    <div class="scene-title-pill" aria-hidden="true">
+      <span>双眼整合后的画面</span>
+    </div>
+
+    <div class="time-card glass-card ui-interactive">
+      <div class="time-card-top">
+        <div class="time-card-left">
+          <span class="time-card-title">状态持续时间</span>
+          <span class="time-card-hint">拖动时间，观察使用比例变化</span>
+        </div>
+        <div class="time-card-right">
+          <p class="stage-caption" id="stage-caption"></p>
+        </div>
+      </div>
+      <div class="time-slider-wrap">
+        <input type="range" id="time-slider" class="time-slider" min="0" max="10000" step="1" value="0" />
+        <div class="time-marks">
+          <span data-threshold="0">状态持续初期</span>
+          <span data-threshold="0.5">持续数周至数月</span>
+          <span data-threshold="1">长期未干预</span>
+        </div>
+      </div>
+      <div class="time-card-note-slot">
+        <div class="stage-child-note" id="stage-child-note">
+          <span class="stage-child-note-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="7" cy="7" r="6.25" stroke="currentColor" stroke-width="1.25"/>
+              <path d="M7 4.2v3.1M7 9.4h.01" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="stage-child-note-copy">
+            <span id="stage-child-note-lead"></span><span class="stage-child-note-emphasis" id="stage-child-note-emphasis"></span><span class="stage-child-note-tail">。</span>
+          </span>
+          <button type="button" class="intervention-toggle" id="intervention-toggle">了解干预方式</button>
+        </div>
+      </div>
+      <p class="mode-explanation" id="mode-explanation" hidden aria-hidden="true"></p>
+    </div>
+
+    <div class="help-toolbar ui-interactive">
+      <button
+        type="button"
+        class="voice-btn glass-outline"
+        id="voice-btn"
+        aria-label="关闭语音讲解"
+        aria-pressed="true"
+        title="关闭语音讲解"
+      >
+        <svg class="voice-icon voice-icon-on" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M3.2 6.4v5.2h3.2L10.8 15V3L6.4 6.4H3.2z" fill="currentColor"/>
+          <path d="M12.2 6.1a4.6 4.6 0 010 5.8M13.8 4.2a7 7 0 010 9.6" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+        </svg>
+        <svg class="voice-icon voice-icon-off" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M3.2 6.4v5.2h3.2L10.8 15V3L6.4 6.4H3.2z" fill="currentColor"/>
+          <path d="M12.8 6.8l-6 6M6.8 6.8l6 6" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button type="button" class="help-btn glass-outline" id="help-btn" aria-label="使用说明">
+        <span class="help-icon">?</span>
+        <span>使用说明</span>
+      </button>
+      <div class="affected-eye-switch glass-outline" role="group" aria-label="选择异常侧">
+        <span class="affected-eye-label">异常侧</span>
+        <button type="button" class="affected-eye-btn" data-affected-eye="left">左眼</button>
+        <button type="button" class="affected-eye-btn active" data-affected-eye="right">右眼</button>
+      </div>
+    </div>
+
+    <aside class="mode-panel mode-panel--right ui-interactive" id="mode-panel">
+      <div class="mode-panel-glass glass-card">
+        <h2 class="mode-panel-title" id="mode-panel-title">右眼状态</h2>
+        <div class="mode-buttons" role="group" aria-label="异常侧状态">
+          <button type="button" class="mode-btn active" data-mode="normal">清晰</button>
+          <button type="button" class="mode-btn" data-mode="blur">模糊</button>
+          <button type="button" class="mode-btn" data-mode="misalignment">斜视</button>
+          <button type="button" class="mode-btn" data-mode="occlusion">遮挡</button>
+        </div>
+      </div>
+    </aside>
+
+    <div class="right-stack ui-interactive">
+      <article class="eye-card glass-card" id="right-eye-card">
+        <header class="eye-card-header">
+          <h2 class="eye-card-title">右眼大脑画面</h2>
+          <span class="eye-tag eye-tag-blue" id="right-eye-tag">两眼都清晰</span>
+        </header>
+        <canvas id="right-thumb" class="eye-thumb right-eye-preview"></canvas>
+        <p class="eye-card-desc">只使用右眼信息时，大脑形成的画面。</p>
+      </article>
+    </div>
+
+    <div class="ball-scene-hint" id="ball-scene-hint" hidden aria-live="polite">
+      <span class="ball-scene-hint-pill" id="ball-scene-hint-pill"></span>
+    </div>
+
+    <div class="success-toast" id="success-toast" hidden role="status" aria-live="polite">
+      <div class="success-toast-card">
+        <span class="success-icon" aria-hidden="true">✓</span>
+        <div class="success-toast-body">
+          <p class="success-title" id="success-title">已对准</p>
+          <p class="success-subtitle" id="success-subtitle"></p>
+        </div>
+      </div>
+    </div>
+
+    <article class="eye-card glass-card ui-interactive" id="left-eye-card">
+      <header class="eye-card-header">
+        <h2 class="eye-card-title">左眼大脑画面</h2>
+        <span class="eye-tag eye-tag-green" id="left-eye-tag">画面清晰</span>
+      </header>
+      <canvas id="left-thumb" class="eye-thumb left-eye-preview"></canvas>
+      <p class="eye-card-desc">只使用左眼信息时，大脑形成的画面。</p>
+    </article>
+
+    <div class="usage-module ui-interactive" id="usage-module">
+      <h2 class="usage-title">双眼整合画面来源</h2>
+      <div class="usage-bar" id="usage-bar" role="img" aria-label="双眼整合画面来源">
+        <div class="usage-segment usage-left" id="usage-left"></div>
+        <div class="usage-segment usage-right" id="usage-right"></div>
+      </div>
+      <div class="usage-labels">
+        <span>左眼画面</span>
+        <span>右眼画面</span>
+      </div>
+    </div>
+
+    <!-- 通路锚点：视觉焦点区域（珠子+小柱），不遮挡交互 -->
+    <div class="scene-focus-anchor" id="scene-section" aria-hidden="true"></div>
+
+    <div class="help-overlay ui-interactive" id="help-overlay" hidden>
+      <div class="help-dialog glass-card" role="dialog" aria-labelledby="help-title">
+        <header class="help-header">
+          <h2 id="help-title">使用说明</h2>
+        </header>
+        <div class="help-body">
+          <div class="help-sections">
+            <section class="help-section">
+              <span class="help-section-label">观察变化</span>
+              <p>先选择左眼或右眼作为异常侧，再切换它的画面状态。拖动时间轴，观察大脑如何逐渐减少使用这一路视觉信息。</p>
+            </section>
+            <section class="help-section">
+              <span class="help-section-label">体验操作</span>
+              <p>在「状态持续初期」和「长期未干预」阶段，可以拖动圆环从上方套入小柱，感受空间判断变差后带来的操作变化。</p>
+            </section>
+          </div>
+          <p class="help-disclaimer">本演示仅用于科普示意，不能替代专业检查。</p>
+        </div>
+        <footer class="help-footer">
+          <button type="button" class="help-close" id="help-close">知道了</button>
+        </footer>
+      </div>
+    </div>
+
+    <div class="intervention-modal ui-interactive" id="intervention-modal" hidden>
+      <div class="intervention-dialog glass-card" role="dialog" aria-modal="true" aria-labelledby="intervention-title">
+        <button class="intervention-close" id="intervention-close" type="button" aria-label="关闭干预说明" title="关闭">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+            <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+          </svg>
+        </button>
+        <header class="intervention-header">
+          <h2 id="intervention-title">及时规范干预</h2>
+          <p>先改善视觉输入，再帮助弱视眼参与，并持续复查调整。</p>
+        </header>
+        <div class="intervention-flow" aria-label="常见干预流程">
+          <article class="intervention-card intervention-card--blue">
+            <div class="intervention-card-head">
+              <span class="intervention-step">01</span>
+              <h3>让画面更清楚</h3>
+            </div>
+            <img class="intervention-illustration" src="assets/images/intervention-visual-input.png" alt="儿童进行视力检查" draggable="false" />
+            <p id="intervention-input-copy"></p>
+            <div class="intervention-tags">
+              <span>全面检查</span>
+              <span>处理原因</span>
+            </div>
+          </article>
+          <article class="intervention-card intervention-card--orange">
+            <div class="intervention-card-head">
+              <span class="intervention-step">02</span>
+              <h3>让弱视眼多参与</h3>
+            </div>
+            <img class="intervention-illustration" src="assets/images/intervention-eye-participation.png" alt="儿童进行适龄视觉活动" draggable="false" />
+            <p>医生指导下进行限时遮盖，并配合弱视训练卡、穿珠子等精细视觉活动。</p>
+            <div class="intervention-tags">
+              <span>限时遮盖</span>
+              <span>精细视觉活动</span>
+            </div>
+          </article>
+          <article class="intervention-card intervention-card--green">
+            <div class="intervention-card-head">
+              <span class="intervention-step">03</span>
+              <h3>坚持治疗，定期复查</h3>
+            </div>
+            <img class="intervention-illustration" src="assets/images/intervention-follow-up.png" alt="医生为儿童复查并调整方案" draggable="false" />
+            <p>根据视力和双眼功能变化调整治疗强度和时长，不要擅自中断训练。</p>
+            <div class="intervention-tags">
+              <span>定期复查</span>
+              <span>遵医嘱调整</span>
+            </div>
+          </article>
+        </div>
+        <div class="intervention-disclaimer">
+          <span class="intervention-disclaimer-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+              <path d="M12 3 5 6v5.2c0 4.2 2.8 7.8 7 9.8 4.2-2 7-5.6 7-9.8V6l-7-3Z" fill="currentColor" opacity="0.92"/>
+              <path d="M8.7 12.2 11 14.5l4.4-4.7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span>具体方案因病因、年龄和视力情况而异，请遵照专业眼科医生指导。</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="intro-modal ui-interactive" id="intro-modal" role="dialog" aria-modal="true" aria-labelledby="intro-title" hidden>
+      <div class="intro-card" role="document">
+        <img class="intro-card-bg" src="assets/images/bupt-intelligent-interaction-card-bg.png" alt="" draggable="false" />
+        <button class="intro-close" id="intro-close" type="button" aria-label="关闭介绍" title="关闭">
+          <svg viewBox="0 0 48 48" width="28" height="28" fill="none" aria-hidden="true">
+            <path d="M12 12 36 36M36 12 12 36" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+          </svg>
+        </button>
+
+        <div class="intro-content">
+          <h2 id="intro-title">北京邮电大学智能交互设计</h2>
+          <div class="intro-accent" aria-hidden="true"></div>
+          <p>
+            北京邮电大学智能交互设计专业是教育部批准设立的国内首个智能交互设计本科专业，入选北京市“一流本科专业”建设点，获评软科A+专业。面向国家“人工智能+”战略布局，专业构建“智能计算+交互创新”双核培养体系，持续引领智能产品设计与开发的前沿方向。
+          </p>
+        </div>
+
+        <div class="intro-stats" aria-label="专业亮点">
+          <div class="intro-stat">
+            <span class="stat-icon">
+              <svg viewBox="0 0 64 64" width="40" height="40" fill="none" aria-hidden="true">
+                <path d="M8 24 32 12l24 12-24 12L8 24Z" stroke="currentColor" stroke-width="6" stroke-linejoin="round" />
+                <path d="M18 32v10c6 6 22 6 28 0V32" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+                <path d="M54 26v14" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+              </svg>
+            </span>
+            <strong>国内首个</strong>
+          </div>
+          <div class="intro-stat">
+            <span class="stat-icon">
+              <svg viewBox="0 0 64 64" width="40" height="40" fill="none" aria-hidden="true">
+                <path d="M18 8h10v14H18V8Zm18 0h10v14H36V8Z" fill="currentColor" />
+                <circle cx="32" cy="38" r="16" stroke="currentColor" stroke-width="6" />
+                <path d="m32 29 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6Z" fill="currentColor" />
+              </svg>
+            </span>
+            <strong>北京市一流本科专业</strong>
+          </div>
+          <div class="intro-stat">
+            <span class="stat-icon">
+              <svg viewBox="0 0 64 64" width="40" height="40" fill="none" aria-hidden="true">
+                <path d="M22 14h20v12c0 10-5 18-10 18s-10-8-10-18V14Z" stroke="currentColor" stroke-width="6" />
+                <path d="M22 20H12v6c0 8 5 12 12 12M42 20h10v6c0 8-5 12-12 12" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+                <path d="M32 44v8M22 56h20" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+                <path d="m32 23 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6Z" fill="currentColor" />
+              </svg>
+            </span>
+            <strong>软科A+</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="assets/js/main.js?v=81"></script>
+</body>
+</html>

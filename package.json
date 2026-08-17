@@ -1,0 +1,11 @@
+{
+  "name": "zimeng-interactive-portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs && node scripts/serve.mjs",
+    "install:demos": "npm ci --prefix amblyopia && npm ci --prefix \"shadow story\"",
+    "capture:covers": "node scripts/capture-covers.mjs"
+  }
+}
